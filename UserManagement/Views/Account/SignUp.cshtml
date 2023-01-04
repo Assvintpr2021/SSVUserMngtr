@@ -1,0 +1,98 @@
+﻿@model UserManagement.Models.UserViewModel
+
+@{
+    ViewData["Title"] = "SignUp";
+}
+
+<h1>SignUp</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="SignUp">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="control-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ConfirmPassword" class="control-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Contact" class="control-label"></label>
+                <input asp-for="Contact" class="form-control" />
+                <span asp-validation-for="Contact" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CountryId" class="control-label"></label>
+                <select asp-for="CountryId" class="form-control"
+                asp-items="@(new SelectList(Model.Countries,"Value","Text"))">
+                <option disabled selected>---Select Country---</option>
+                </select>
+                <span asp-validation-for="CountryId" class="text-danger"></span>
+            </div>
+           <div>
+                <label asp-for="CityId" class="control-label"></label>
+                <select asp-for="CityId" class="form-control">
+                    <option disabled selected>---Select City---</option>
+                </select>
+                <span asp-validation-for="CityId" class="text-danger"></span>
+            </div>
+             <div class="form-group">
+                Gender :
+                @foreach (var person in Model.GenderList)
+                {
+                    <input type="radio" id="@person.Value" name="Gender" value="@person.Text" asp-for="Gender" />
+                    <label for="@person.Text">@person.Text</label>
+                }
+                <span asp-validation-for="Gender" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check">
+                <label class="form-check-label">
+                    <input class="form-check-input" asp-for="Terms" /> @Html.DisplayNameFor(model => model.Terms)
+                </label>
+                <span asp-validation-for="Terms" class="text-danger"></span>
+            </div>
+            <div class="form-group" padding-bottom: 200px;>
+                <input type="submit" value="Sign Up" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts{
+<partial name="_ValidationScriptsPartial" />
+<script>
+
+    $("select#CountryId").change(function(){
+        var countryId = $(this).val();
+        debugger;
+        console.log(countryId);
+        $.getJSON(`/Account/ChangeCityByCountry?countryId=${countryId}`,function(data){
+            $("select#CityId").empty();
+            $("select#CityId").append(`<option disabled selected>---Select City---</option>`);
+            console.log(data);
+            $.each(data,function(i,item){
+                $("select#CityId").append(`<option value="${item.value}">${item.text}</option>`);
+            });
+        });
+    });
+    
+    jQuery.validator.unobtrusive.adapters.add("checkbox", function (options) {
+         if (options.element.tagName.toUpperCase() == "INPUT" && options.element.type.toUpperCase() == "CHECKBOX") {
+              options.rules["required"] = true;
+             if (options.message) {
+                 options.messages["required"] = options.message;
+             }
+         }
+     });
+</script>
+}
+
